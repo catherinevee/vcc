@@ -1,0 +1,793 @@
+/**
+ * VCC - Vibe-Code Checker Stylesheet
+ * Author: Aziza Ocosso
+ * Company: VCCC
+ * 
+ * Design Philosophy:
+ * - No decorative emojis or icons
+ * - Asymmetric layouts with intentional spacing
+ * - Sharp edges, no generic rounded corners
+ * - Brutalist aesthetic with thick borders
+ * - Monospace typography for technical content
+ */
+
+/* ============================================
+   CSS RESET & VARIABLES
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Primary palette - sophisticated monochrome */
+    --vcc-ink: #1a1f36;
+    --vcc-steel: #494e5f;
+    --vcc-chalk: #f4f3f1;
+    --vcc-paper: #fdfcfa;
+    
+    /* Accent colors - selective use only */
+    --vcc-accent: #5b4cfd;
+    --vcc-accent-muted: #7c71ff;
+    
+    /* Semantic colors */
+    --vcc-critical: #c41e3a;
+    --vcc-warn: #d94f00;
+    --vcc-safe: #2d6e3e;
+    --vcc-highlight: #ffd23f;
+    --vcc-cite: #0066cc;
+    
+    /* Typography */
+    --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, 'Courier New', monospace;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+    
+    /* Spacing scale - intentionally irregular */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-xxl: 48px;
+    --space-xxxl: 64px;
+    
+    /* Borders - thick and decisive */
+    --border-thin: 1px solid var(--vcc-steel);
+    --border-medium: 2px solid var(--vcc-ink);
+    --border-thick: 3px solid var(--vcc-ink);
+    
+    /* Z-index scale */
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-modal: 1000;
+    --z-tooltip: 1100;
+}
+
+/* ============================================
+   BASE TYPOGRAPHY
+   ============================================ */
+
+html {
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-mono);
+    background: var(--vcc-paper);
+    color: var(--vcc-ink);
+    line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+h1 { 
+    font-size: 2.8rem; 
+    letter-spacing: -0.03em;
+}
+
+h2 { 
+    font-size: 1.875rem;
+    border-bottom: var(--border-medium);
+    padding-bottom: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+h3 { 
+    font-size: 1.25rem;
+    color: var(--vcc-accent);
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-md);
+}
+
+p {
+    margin-bottom: var(--space-md);
+    font-family: var(--font-sans);
+    line-height: 1.8;
+}
+
+a {
+    color: var(--vcc-accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+
+a:hover {
+    border-bottom-color: var(--vcc-accent);
+}
+
+code {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    background: var(--vcc-chalk);
+    padding: 2px 6px;
+}
+
+pre {
+    background: var(--vcc-ink);
+    color: var(--vcc-paper);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    border-left: 4px solid var(--vcc-accent);
+}
+
+pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+
+/* ============================================
+   LAYOUT COMPONENTS
+   ============================================ */
+
+/* Header with asymmetric alignment */
+.vcc-header {
+    background: var(--vcc-paper);
+    border-bottom: var(--border-medium);
+    padding: 18px 24px 16px 32px; /* Intentionally uneven */
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+}
+
+.vcc-mark {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--vcc-ink);
+}
+
+.vcc-mark-symbol {
+    font-weight: 900;
+    font-size: 1.75rem;
+    letter-spacing: -0.125rem;
+    position: relative;
+    top: -2px; /* Slight misalignment for character */
+}
+
+.vcc-mark-text {
+    font-size: 0.8125rem;
+    letter-spacing: 0.03125rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* Navigation */
+.vcc-nav {
+    display: flex;
+    gap: 28px; /* Irregular spacing */
+    align-items: baseline;
+}
+
+.vcc-nav a {
+    color: var(--vcc-steel);
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    position: relative;
+}
+
+.vcc-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--vcc-accent);
+    transition: width 0.2s;
+}
+
+.vcc-nav a:hover::after {
+    width: 100%;
+}
+
+/* Main content container */
+.vcc-main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: var(--space-xxxl) var(--space-xl) var(--space-xxl) 40px; /* Asymmetric */
+}
+
+/* ============================================
+   BUTTONS & INTERACTIONS
+   ============================================ */
+
+.vcc-btn {
+    display: inline-block;
+    padding: 14px 32px 12px 28px; /* Uneven padding */
+    background: var(--vcc-ink);
+    color: var(--vcc-paper);
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 2px solid var(--vcc-ink);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    
+    /* Angular clip-path for unique shape */
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 100%, 8px 100%);
+}
+
+.vcc-btn:hover {
+    background: var(--vcc-paper);
+    color: var(--vcc-ink);
+    transform: translateX(4px);
+}
+
+.vcc-btn-secondary {
+    background: transparent;
+    color: var(--vcc-ink);
+}
+
+.vcc-btn-secondary:hover {
+    background: var(--vcc-ink);
+    color: var(--vcc-paper);
+}
+
+/* ============================================
+   LISTS & FEATURES
+   ============================================ */
+
+/* Feature list with varying indentation */
+.vcc-features {
+    list-style: none;
+    margin-top: var(--space-xxxl);
+}
+
+.vcc-feature {
+    margin-bottom: 36px;
+    border-left: var(--border-thin);
+    position: relative;
+}
+
+/* Intentionally irregular indentation pattern */
+.vcc-feature:nth-child(1) { padding-left: 24px; }
+.vcc-feature:nth-child(2) { padding-left: 48px; }
+.vcc-feature:nth-child(3) { padding-left: 36px; }
+.vcc-feature:nth-child(4) { padding-left: 60px; }
+.vcc-feature:nth-child(5) { padding-left: 12px; }
+.vcc-feature:nth-child(6) { padding-left: 42px; }
+
+.vcc-feature::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 8px;
+    width: 7px;
+    height: 7px;
+    background: var(--vcc-accent);
+    transform: rotate(45deg);
+}
+
+.vcc-feature-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: var(--space-xs);
+}
+
+.vcc-feature-desc {
+    color: var(--vcc-steel);
+    font-size: 0.875rem;
+    font-family: var(--font-sans);
+}
+
+/* ============================================
+   REPOSITORY ITEMS
+   ============================================ */
+
+.vcc-repo-list {
+    list-style: none;
+}
+
+.vcc-repo-item {
+    border-bottom: var(--border-thin);
+    padding: 20px 0;
+    cursor: pointer;
+    transition: padding-left 0.2s;
+    position: relative;
+}
+
+.vcc-repo-item:hover {
+    padding-left: var(--space-md);
+}
+
+.vcc-repo-item::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 28px;
+    width: 6px;
+    height: 6px;
+    background: var(--vcc-accent);
+    opacity: 0;
+    transform: rotate(45deg);
+    transition: opacity 0.2s;
+}
+
+.vcc-repo-item:hover::before {
+    opacity: 1;
+}
+
+.vcc-repo-name {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: var(--space-xs);
+}
+
+.vcc-repo-desc {
+    color: var(--vcc-steel);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-sm);
+    font-family: var(--font-sans);
+}
+
+.vcc-repo-meta {
+    font-size: 0.75rem;
+    color: var(--vcc-steel);
+    display: flex;
+    gap: var(--space-lg);
+}
+
+/* ============================================
+   STATISTICS
+   ============================================ */
+
+.vcc-stats {
+    display: flex;
+    gap: 0;
+    border-top: var(--border-thin);
+    padding-top: var(--space-xl);
+    margin-top: var(--space-xxxl);
+}
+
+.vcc-stat {
+    flex: 1;
+    padding: 0 var(--space-lg);
+    border-right: var(--border-thin);
+}
+
+.vcc-stat:last-child {
+    border-right: none;
+}
+
+.vcc-stat-value {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--vcc-accent);
+    letter-spacing: -0.0625rem;
+}
+
+.vcc-stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+    color: var(--vcc-steel);
+    margin-top: var(--space-xs);
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+
+.vcc-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 31, 54, 0.95);
+    z-index: var(--z-modal);
+    align-items: center;
+    justify-content: center;
+}
+
+.vcc-modal.active {
+    display: flex;
+}
+
+.vcc-modal-content {
+    background: var(--vcc-paper);
+    border: var(--border-thick);
+    max-width: 720px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: var(--space-xl);
+    position: relative;
+}
+
+.vcc-modal-close {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    cursor: pointer;
+    color: var(--vcc-steel);
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.vcc-modal-close:hover {
+    color: var(--vcc-ink);
+}
+
+/* ============================================
+   ANALYSIS RESULTS
+   ============================================ */
+
+.vcc-score {
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: -0.125rem;
+    text-align: center;
+    margin-bottom: var(--space-sm);
+}
+
+.vcc-score.critical { color: var(--vcc-critical); }
+.vcc-score.high { color: var(--vcc-warn); }
+.vcc-score.medium { color: var(--vcc-accent); }
+.vcc-score.low { color: var(--vcc-safe); }
+
+.vcc-score-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+    color: var(--vcc-steel);
+    text-align: center;
+}
+
+/* ============================================
+   FINDINGS
+   ============================================ */
+
+.vcc-finding {
+    border-left: 3px solid;
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    background: var(--vcc-chalk);
+}
+
+.vcc-finding.critical { border-color: var(--vcc-critical); }
+.vcc-finding.high { border-color: var(--vcc-warn); }
+.vcc-finding.medium { border-color: var(--vcc-accent); }
+.vcc-finding.low { border-color: var(--vcc-safe); }
+
+.vcc-finding-title {
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+}
+
+.vcc-finding-location {
+    font-size: 0.75rem;
+    color: var(--vcc-steel);
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-sm);
+}
+
+.vcc-finding-fix {
+    font-size: 0.875rem;
+    color: var(--vcc-steel);
+    font-style: italic;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+.vcc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-lg) 0;
+    font-size: 0.875rem;
+}
+
+.vcc-table th {
+    background: var(--vcc-ink);
+    color: var(--vcc-paper);
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03125rem;
+}
+
+.vcc-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: var(--border-thin);
+}
+
+.vcc-table tr:hover {
+    background: var(--vcc-chalk);
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.vcc-loading {
+    text-align: center;
+    padding: var(--space-xxl);
+}
+
+.vcc-loading-text {
+    font-size: 0.875rem;
+    color: var(--vcc-steel);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* No spinner animations - just text */
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.vcc-footer {
+    border-top: var(--border-medium);
+    padding: var(--space-xl);
+    margin-top: 96px; /* Large intentional gap */
+    background: var(--vcc-chalk);
+}
+
+.vcc-footer-content {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.vcc-footer-brand {
+    font-weight: 900;
+    font-size: 1.125rem;
+    margin-bottom: var(--space-xs);
+}
+
+.vcc-footer-meta {
+    font-size: 0.75rem;
+    color: var(--vcc-steel);
+}
+
+.vcc-footer-links {
+    display: flex;
+    gap: var(--space-lg);
+}
+
+.vcc-footer-links a {
+    color: var(--vcc-steel);
+    font-size: 0.8125rem;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.vcc-text-muted { color: var(--vcc-steel); }
+.vcc-text-accent { color: var(--vcc-accent); }
+.vcc-text-critical { color: var(--vcc-critical); }
+.vcc-text-warn { color: var(--vcc-warn); }
+.vcc-text-safe { color: var(--vcc-safe); }
+
+.vcc-mt-xs { margin-top: var(--space-xs); }
+.vcc-mt-sm { margin-top: var(--space-sm); }
+.vcc-mt-md { margin-top: var(--space-md); }
+.vcc-mt-lg { margin-top: var(--space-lg); }
+.vcc-mt-xl { margin-top: var(--space-xl); }
+
+.vcc-mb-xs { margin-bottom: var(--space-xs); }
+.vcc-mb-sm { margin-bottom: var(--space-sm); }
+.vcc-mb-md { margin-bottom: var(--space-md); }
+.vcc-mb-lg { margin-bottom: var(--space-lg); }
+.vcc-mb-xl { margin-bottom: var(--space-xl); }
+
+.vcc-hidden { display: none; }
+.vcc-visible { display: block; }
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+    
+    .vcc-header {
+        padding: var(--space-md);
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .vcc-main {
+        padding: var(--space-lg) var(--space-md);
+    }
+    
+    .vcc-feature {
+        padding-left: var(--space-lg) !important; /* Override nth-child */
+    }
+    
+    .vcc-stats {
+        flex-direction: column;
+        gap: var(--space-lg);
+    }
+    
+    .vcc-stat {
+        border-right: none;
+        border-bottom: var(--border-thin);
+        padding-bottom: var(--space-lg);
+    }
+    
+    .vcc-modal-content {
+        width: 95%;
+        padding: var(--space-md);
+    }
+    
+    .vcc-table {
+        font-size: 0.75rem;
+    }
+    
+    .vcc-table th,
+    .vcc-table td {
+        padding: var(--space-xs) var(--space-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    
+    .vcc-repo-meta {
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+    
+    .vcc-footer-content {
+        flex-direction: column;
+        gap: var(--space-lg);
+    }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+    .vcc-header,
+    .vcc-nav,
+    .vcc-footer,
+    .vcc-btn,
+    .vcc-modal {
+        display: none;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #000;
+        background: #fff;
+    }
+    
+    a {
+        color: #000;
+        text-decoration: underline;
+    }
+    
+    .vcc-main {
+        max-width: 100%;
+        padding: 0;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Focus styles */
+*:focus {
+    outline: 2px solid var(--vcc-accent);
+    outline-offset: 2px;
+}
+
+/* Skip to content */
+.vcc-skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--vcc-ink);
+    color: var(--vcc-paper);
+    padding: var(--space-sm) var(--space-md);
+    text-decoration: none;
+    z-index: var(--z-tooltip);
+}
+
+.vcc-skip-link:focus {
+    top: 0;
+}
+
+/* Screen reader only */
+.vcc-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --vcc-ink: #000;
+        --vcc-paper: #fff;
+        --vcc-accent: #0000ff;
+        --vcc-critical: #ff0000;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --vcc-ink: #e2e8f0;
+        --vcc-steel: #94a3b8;
+        --vcc-chalk: #1e293b;
+        --vcc-paper: #0f172a;
+        --vcc-accent: #818cf8;
+    }
+}

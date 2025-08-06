@@ -1,0 +1,40 @@
+---
+# chaos-engineering.yaml - Chaos testing for resilience
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-failure-test
+  namespace: vibe-detector
+spec:
+  action: pod-failure
+  mode: random-max-percent
+  value: "30"
+  duration: "30s"
+  selector:
+    namespaces:
+    - vibe-detector
+    labelSelectors:
+      "app": "vibe-detector"
+  scheduler:
+    cron: "@daily"
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-delay-test
+  namespace: vibe-detector
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+    - vibe-detector
+    labelSelectors:
+      "app": "vibe-detector"
+  delay:
+    latency: "100ms"
+    correlation: "25"
+    jitter: "10ms"
+  duration: "5m"
+  scheduler:
+    cron: "0 */6 * * *"

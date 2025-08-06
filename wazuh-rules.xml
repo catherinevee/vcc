@@ -1,0 +1,39 @@
+---
+# wazuh-rules.xml - Custom Wazuh rules for the application
+<group name="vibe-code-detector">
+  <rule id="100001" level="10">
+    <decoded_as>json</decoded_as>
+    <field name="event_type">^oauth_state_mismatch$</field>
+    <description>OAuth state parameter mismatch detected</description>
+    <group>authentication_failed,</group>
+  </rule>
+
+  <rule id="100002" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="event_type">^unauthorized_analysis$</field>
+    <description>Unauthorized repository analysis attempt</description>
+    <group>access_denied,</group>
+  </rule>
+
+  <rule id="100003" level="8">
+    <decoded_as>json</decoded_as>
+    <field name="event_type">^csp_violation$</field>
+    <description>Content Security Policy violation</description>
+    <group>web_scan,</group>
+  </rule>
+
+  <rule id="100004" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="severity">^critical$</field>
+    <description>Critical security event detected</description>
+    <group>security_event,</group>
+  </rule>
+
+  <rule id="100005" level="10">
+    <if_sid>100001</if_sid>
+    <frequency>3</frequency>
+    <timeframe>300</timeframe>
+    <description>Multiple OAuth state mismatches - possible attack</description>
+    <group>authentication_attack,</group>
+  </rule>
+</group>

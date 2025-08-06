@@ -1,0 +1,96 @@
+---
+# incident-response.yaml - Incident response automation
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: incident-response
+  namespace: vibe-detector
+data:
+  respond.py: |
+    #!/usr/bin/env python3
+    import json
+    import time
+    import redis
+    import requests
+    from datetime import datetime
+
+    class IncidentResponder:
+        def __init__(self):
+            self.redis_client = redis.from_url(os.environ['REDIS_URL'])
+            self.vault_client = hvac.Client(url=os.environ['VAULT_URL'])
+            
+        def handle_security_event(self, event):
+            severity = event.get('severity')
+            event_type = event.get('event_type')
+            
+            if severity == 'critical':
+                self.critical_response(event)
+            elif severity == 'high':
+                self.high_response(event)
+            
+            self.log_incident(event)
+            self.notify_team(event)
+        
+        def critical_response(self, event):
+            """Automated response to critical security events"""
+            
+            # 1. Isolate affected components
+            if 'user_id' in event['details']:
+                self.block_user(event['details']['user_id'])
+            
+            # 2. Rotate compromised credentials
+            if event['event_type'] == 'credential_compromise':
+                self.rotate_all_secrets()
+            
+            # 3. Enable enhanced monitoring
+            self.enable_enhanced_monitoring()
+            
+            # 4. Capture forensic data
+            self.capture_forensics(event)
+            
+            # 5. Initiate containment
+            if event['event_type'] in ['unauthorized_access', 'data_breach']:
+                self.enable_read_only_mode()
+        
+        def block_user(self, user_id):
+            """Block user access immediately"""
+            self.redis_client.setex(f"blocked_user:{user_id}", 86400, "1")
+            self.redis_client.delete(f"session:{user_id}")
+            
+        def rotate_all_secrets(self):
+            """Rotate all secrets in Vault"""
+            self.vault_client.sys.rotate()
+            
+            # Trigger application restart to pick up new secrets
+            requests.post('http://localhost:5000/admin/restart', 
+                         headers={'X-Admin-Token': os.environ['ADMIN_TOKEN']})
+        
+        def enable_enhanced_monitoring(self):
+            """Enable verbose logging and monitoring"""
+            self.redis_client.set("monitoring_level", "debug")
+            self.redis_client.set("log_all_requests", "1")
+            
+        def capture_forensics(self, event):
+            """Capture forensic data for investigation"""
+            timestamp = datetime.now().isoformat()
+            
+            forensics = {
+                'timestamp': timestamp,
+                'event': event,
+                'system_state': self.get_system_state(),
+                'recent_logs': self.get_recent_logs(),
+                'active_sessions': self.get_active_sessions(),
+                'network_connections': self.get_network_connections()
+            }
+            
+            # Store encrypted forensics
+            encrypted = self.encrypt_data(json.dumps(forensics))
+            self.redis_client.set(f"forensics:{timestamp}", encrypted)
+            
+            # Upload to secure storage
+            self.upload_to_secure_storage(f"forensics/{timestamp}.enc", encrypted)
+        
+        def enable_read_only_mode(self):
+            """Switch application to read-only mode"""
+            self.redis_client.set("read_only_mode", "1")
+            self.redis_client.set("block_all_writes", "1")

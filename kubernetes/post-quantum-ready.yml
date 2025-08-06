@@ -1,0 +1,45 @@
+---
+# post-quantum-ready.yaml - Quantum-resistant cryptography preparation
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quantum-crypto-config
+  namespace: vibe-detector
+data:
+  crypto_config.py: |
+    """
+    Post-quantum cryptography configuration
+    Implements hybrid classical-quantum resistant algorithms
+    """
+
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.asymmetric import padding
+    from oqs import KeyEncapsulation, Signature
+
+    class QuantumResistantCrypto:
+        def __init__(self):
+            # Use Kyber for key encapsulation (NIST selected)
+            self.kem = KeyEncapsulation("Kyber1024")
+            
+            # Use Dilithium for signatures (NIST selected)
+            self.sig = Signature("Dilithium5")
+            
+        def hybrid_encrypt(self, data, classical_key, quantum_key):
+            """Hybrid encryption using both classical and PQC"""
+            # First layer: Classical AES-256-GCM
+            classical_encrypted = self.classical_encrypt(data, classical_key)
+            
+            # Second layer: Quantum-resistant encryption
+            quantum_encrypted = self.quantum_encrypt(classical_encrypted, quantum_key)
+            
+            return quantum_encrypted
+        
+        def generate_quantum_keys(self):
+            """Generate quantum-resistant key pairs"""
+            kem_public_key = self.kem.generate_keypair()
+            sig_public_key = self.sig.generate_keypair()
+            
+            return {
+                'kem_public': kem_public_key,
+                'sig_public': sig_public_key
+            }

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - VCC | VCCC</title>
+    <meta name="author" content="Aziza Ocosso">
+    <meta name="company" content="VCCC">
+    <style>
+        :root {
+            /* Sophisticated asymmetric color palette */
+            --vcc-ink: #1a1f36;
+            --vcc-steel: #494e5f;
+            --vcc-chalk: #f4f3f1;
+            --vcc-paper: #fdfcfa;
+            --vcc-accent: #5b4cfd;
+            --vcc-accent-muted: #7c71ff;
+            --vcc-warn: #d94f00;
+            --vcc-critical: #c41e3a;
+            --vcc-safe: #2d6e3e;
+            --vcc-highlight: #ffd23f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+            background: var(--vcc-paper);
+            color: var(--vcc-ink);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .vcc-header {
+            background: var(--vcc-paper);
+            border-bottom: 2px solid var(--vcc-ink);
+            padding: 18px 24px 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .vcc-mark {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--vcc-ink);
+        }
+
+        .vcc-mark-symbol {
+            font-weight: 900;
+            font-size: 28px;
+            letter-spacing: -2px;
+            position: relative;
+            top: -2px;
+        }
+
+        .vcc-mark-text {
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .vcc-nav {
+            display: flex;
+            gap: 28px;
+            align-items: baseline;
+        }
+
+        .vcc-nav a {
+            color: var(--vcc-steel);
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        .vcc-main {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 32px;
+        }
+
+        .vcc-title {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 24px;
+            color: var(--vcc-ink);
+        }
+
+        .vcc-section {
+            margin-bottom: 32px;
+        }
+
+        .vcc-section h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--vcc-accent);
+        }
+
+        .vcc-section p {
+            margin-bottom: 16px;
+        }
+
+        .vcc-highlight {
+            background: var(--vcc-highlight);
+            color: var(--vcc-ink);
+            padding: 2px 6px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header class="vcc-header">
+        <a href="/" class="vcc-mark">
+            <span class="vcc-mark-symbol">VCC</span>
+            <span class="vcc-mark-text">Vibe-Code Checker</span>
+        </a>
+        <nav class="vcc-nav">
+            <a href="/">Home</a>
+            <a href="/research">Research</a>
+            <a href="/about">About</a>
+            {% if user %}
+                <a href="/dashboard">Dashboard</a>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/login">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="vcc-main">
+        <h1 class="vcc-title">About VCC</h1>
+        
+        <div class="vcc-section">
+            <h2>Mission</h2>
+            <p>VCC (Vibe-Code Checker) is an advanced security platform designed to detect and remediate vulnerabilities in AI-generated code. We specialize in identifying <span class="vcc-highlight">"vibe-code"</span> patterns that may introduce security risks or performance issues.</p>
+        </div>
+
+        <div class="vcc-section">
+            <h2>Technology</h2>
+            <p>Our platform analyzes repositories for:</p>
+            <ul style="margin-left: 20px; margin-bottom: 16px;">
+                <li>Hardcoded secrets and API keys</li>
+                <li>SQL injection vulnerabilities</li>
+                <li>Firebase misconfigurations</li>
+                <li>Performance anti-patterns (N+1 queries, memory leaks)</li>
+                <li>Architectural inconsistencies</li>
+            </ul>
+        </div>
+
+        <div class="vcc-section">
+            <h2>Security</h2>
+            <p>VCC implements enterprise-grade security measures including zero-trust architecture, WebAuthn authentication, and comprehensive audit logging.</p>
+        </div>
+
+        <div class="vcc-section">
+            <h2>Company</h2>
+            <p><strong>VCCC (Vibe-Code Checking Corporation)</strong><br>
+            Author: {{ app_info.author if app_info else 'Aziza Ocosso' }}<br>
+            Version: {{ app_info.version if app_info else '2.0.0' }}</p>
+        </div>
+    </main>
+</body>
+</html>
