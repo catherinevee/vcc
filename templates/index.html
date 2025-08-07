@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Vibe-Code Detector - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Detect Vibe-Coding Patterns in Your Code
+                </h1>
+                <p class="lead mb-4">
+                    Analyze your GitHub repositories for technical debt, security issues, and code quality problems. 
+                    Get actionable insights to improve your codebase.
+                </p>
+                {% if session.user %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-chart-line"></i> Go to Dashboard
+                </a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-light btn-lg">
+                    <i class="fab fa-github"></i> Login with GitHub
+                </a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-code" style="font-size: 8rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">Why Use Vibe-Code Detector?</h2>
+                <p class="lead text-muted">
+                    Our advanced analysis engine detects patterns that indicate technical debt and code quality issues.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-shield-alt text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Security Analysis</h5>
+                        <p class="card-text">
+                            Detect hardcoded credentials, insecure patterns, and potential vulnerabilities in your code.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-chart-bar text-success" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Code Quality Metrics</h5>
+                        <p class="card-text">
+                            Get detailed metrics on code quality, technical debt, and improvement recommendations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-rocket text-warning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Real-time Analysis</h5>
+                        <p class="card-text">
+                            Watch your analysis progress in real-time with live updates and detailed reports.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">How It Works</h2>
+                <p class="lead text-muted">
+                    Simple three-step process to analyze your repositories
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <span class="fw-bold fs-4">1</span>
+                    </div>
+                </div>
+                <h5>Connect GitHub</h5>
+                <p class="text-muted">
+                    Securely authenticate with your GitHub account to access your repositories.
+                </p>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <span class="fw-bold fs-4">2</span>
+                    </div>
+                </div>
+                <h5>Select Repository</h5>
+                <p class="text-muted">
+                    Choose the repository you want to analyze from your GitHub account.
+                </p>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <span class="fw-bold fs-4">3</span>
+                    </div>
+                </div>
+                <h5>Get Results</h5>
+                <p class="text-muted">
+                    Receive detailed analysis with actionable insights and recommendations.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Supported Languages Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">Supported Languages</h2>
+                <p class="lead text-muted">
+                    We analyze code in multiple programming languages
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-3 justify-content-center">
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">Python</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">JavaScript</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">TypeScript</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">Java</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">C++</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">C#</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">PHP</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">Ruby</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">Go</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">Rust</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">Swift</span>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-primary fs-6 px-3 py-2">Kotlin</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">Ready to Analyze Your Code?</h2>
+        <p class="lead mb-4">
+            Start detecting vibe-coding patterns and improve your code quality today.
+        </p>
+        {% if session.user %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+            <i class="fas fa-chart-line"></i> Start Analysis
+        </a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-light btn-lg">
+            <i class="fab fa-github"></i> Get Started
+        </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %} 

@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Vibe-Code Detector{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analysis-form {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .repo-select {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .progress-container {
+        display: none;
+        margin: 1rem 0;
+    }
+    .result-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+    }
+    .score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: white;
+        margin: 0 auto;
+    }
+    .score-excellent { background: linear-gradient(135deg, #00b894, #00cec9); }
+    .score-good { background: linear-gradient(135deg, #fdcb6e, #e17055); }
+    .score-poor { background: linear-gradient(135deg, #d63031, #e84393); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold">
+                <i class="fas fa-chart-line text-primary"></i> 
+                Welcome, {{ session.user.login }}!
+            </h1>
+            <p class="lead text-muted">
+                Analyze your GitHub repositories for vibe-coding patterns and technical debt.
+            </p>
+        </div>
+    </div>
+
+    <!-- Analysis Form -->
+    <div class="analysis-form">
+        <h3 class="mb-3">
+            <i class="fas fa-search"></i> Start New Analysis
+        </h3>
+        
+        <form id="analysisForm">
+            <div class="row">
+                <div class="col-md-8">
+                    <label for="repoUrl" class="form-label">Repository URL</label>
+                    <input type="url" class="form-control" id="repoUrl" name="repo_url" 
+                           placeholder="https://github.com/username/repository" required>
+                    <div class="form-text">
+                        Enter the full GitHub repository URL you want to analyze.
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100" id="analyzeBtn">
+                        <i class="fas fa-play"></i> Start Analysis
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Progress Section -->
+        <div class="progress-container" id="progressContainer">
+            <h5 class="mb-3">Analysis Progress</h5>
+            <div class="progress mb-3">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" style="width: 0%" id="progressBar">0%</div>
+            </div>
+            <div class="text-muted" id="progressMessage">Initializing analysis...</div>
+        </div>
+    </div>
+
+    <!-- Recent Analyses -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3">
+                <i class="fas fa-history"></i> Recent Analyses
+            </h3>
+            
+            <div id="recentAnalyses">
+                <!-- Results will be populated here -->
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-chart-bar" style="font-size: 3rem; opacity: 0.3;"></i>
+                    <p class="mt-3">No analyses yet. Start your first analysis above!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analysis Results Modal -->
+<div class="modal fade" id="resultsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-chart-pie"></i> Analysis Results
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Results content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="exportBtn">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentAnalysisId = null;
+let resultsModal = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
+    
+    // Handle analysis form submission
+    document.getElementById('analysisForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        startAnalysis();
+    });
+    
+    // Handle export button
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        if (currentAnalysisId) {
+            exportResults(currentAnalysisId);
+        }
+    });
+    
+    // Load recent analyses
+    loadRecentAnalyses();
+});
+
+function startAnalysis() {
+    const repoUrl = document.getElementById('repoUrl').value;
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    
+    // Show progress
+    analyzeBtn.disabled = true;
+    analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    progressContainer.style.display = 'block';
+    
+    // Make API request
+    fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            repo_url: repoUrl
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentAnalysisId = data.result_key;
+            joinAnalysisRoom(data.result_key);
+            updateProgress(10, 'Cloning repository...');
+        } else {
+            showError(data.error || 'Analysis failed to start');
+            resetForm();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showError('Failed to start analysis');
+        resetForm();
+    });
+}
+
+function joinAnalysisRoom(roomId) {
+    socket.emit('join_analysis', { room_id: roomId });
+}
+
+function updateProgress(percent, message) {
+    const progressBar = document.getElementById('progressBar');
+    const progressMessage = document.getElementById('progressMessage');
+    
+    progressBar.style.width = percent + '%';
+    progressBar.textContent = percent + '%';
+    progressMessage.textContent = message;
+}
+
+function resetForm() {
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    
+    analyzeBtn.disabled = false;
+    analyzeBtn.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
+    progressContainer.style.display = 'none';
+    document.getElementById('repoUrl').value = '';
+}
+
+function showError(message) {
+    // Create and show error alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+    alertDiv.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i> ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.querySelector('.analysis-form').insertBefore(alertDiv, document.querySelector('.analysis-form').firstChild);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+function loadRecentAnalyses() {
+    // This would load recent analyses from the server
+    // For now, we'll show a placeholder
+    console.log('Loading recent analyses...');
+}
+
+function showResults(resultKey) {
+    fetch(`/api/results/${resultKey}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayResults(data.report);
+            resultsModal.show();
+        } else {
+            showError('Failed to load results');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading results:', error);
+        showError('Failed to load results');
+    });
+}
+
+function displayResults(report) {
+    const modalBody = document.getElementById('modalBody');
+    
+    // Determine score class
+    let scoreClass = 'score-poor';
+    if (report.vibe_coding_score >= 80) scoreClass = 'score-excellent';
+    else if (report.vibe_coding_score >= 60) scoreClass = 'score-good';
+    
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <div class="score-circle ${scoreClass}">
+                    ${report.vibe_coding_score}
+                </div>
+                <h5 class="mt-3">Vibe-Coding Score</h5>
+                <p class="text-muted">${report.summary}</p>
+            </div>
+            <div class="col-md-8">
+                <h5>Issues by Severity</h5>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-danger">${report.critical_vulnerabilities}</h3>
+                                <p class="mb-0">Critical</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-warning">${report.high_issues}</h3>
+                                <p class="mb-0">High</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-info">${report.medium_issues}</h3>
+                                <p class="mb-0">Medium</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 class="text-success">${report.low_issues}</h3>
+                                <p class="mb-0">Low</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h5 class="mt-4">Technical Debt</h5>
+                <p class="text-muted">Estimated ${report.technical_debt_hours} hours to address all issues.</p>
+                
+                ${report.recommendations.length > 0 ? `
+                <h5>Recommendations</h5>
+                <ul>
+                    ${report.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                </ul>
+                ` : ''}
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h5>Detailed Findings</h5>
+            <div class="accordion" id="findingsAccordion">
+                ${generateFindingsAccordion(report.findings)}
+            </div>
+        </div>
+    `;
+}
+
+function generateFindingsAccordion(findings) {
+    const severityOrder = ['Critical', 'High', 'Medium', 'Low'];
+    const severityColors = {
+        'Critical': 'danger',
+        'High': 'warning',
+        'Medium': 'info',
+        'Low': 'success'
+    };
+    
+    let accordionHtml = '';
+    let itemId = 0;
+    
+    severityOrder.forEach(severity => {
+        const severityFindings = findings.filter(f => f.severity === severity);
+        if (severityFindings.length > 0) {
+            accordionHtml += `
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapse${itemId}">
+                            <span class="badge bg-${severityColors[severity]} me-2">${severityFindings.length}</span>
+                            ${severity} Issues
+                        </button>
+                    </h2>
+                    <div id="collapse${itemId}" class="accordion-collapse collapse" data-bs-parent="#findingsAccordion">
+                        <div class="accordion-body">
+                            ${severityFindings.map(finding => `
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">${finding.description}</h6>
+                                        <p class="card-text"><strong>File:</strong> ${finding.file_path}:${finding.line_number}</p>
+                                        <p class="card-text"><strong>Category:</strong> ${finding.category}</p>
+                                        <p class="card-text"><strong>Fix:</strong> ${finding.fix_suggestion}</p>
+                                        ${finding.code_snippet ? `<pre class="bg-light p-2 rounded"><code>${finding.code_snippet}</code></pre>` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            itemId++;
+        }
+    });
+    
+    return accordionHtml;
+}
+
+function exportResults(resultKey) {
+    const format = 'markdown'; // Could be made configurable
+    window.open(`/api/export/${resultKey}?format=${format}`, '_blank');
+}
+
+// Socket.IO event handlers
+socket.on('analysis_progress', function(data) {
+    updateProgress(data.progress, data.message);
+});
+
+socket.on('analysis_complete', function(data) {
+    updateProgress(100, 'Analysis complete!');
+    setTimeout(() => {
+        resetForm();
+        showResults(data.result_key);
+        loadRecentAnalyses(); // Refresh the list
+    }, 1000);
+});
+
+socket.on('analysis_error', function(data) {
+    showError(data.error || 'Analysis failed');
+    resetForm();
+});
+</script>
+{% endblock %} 
